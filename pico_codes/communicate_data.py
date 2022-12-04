@@ -21,7 +21,8 @@ adc_28=ADC(28).read_u16()
 calibration_pin=ADC(27).read_u16()
 percent0 = calibration_pin * conversion_factor
 percent1 = adc_28 * conversion_factor
-com1.send("Calibration value: "+str(percent0))
+#sending calibration value
+com1.send(str(percent0))
 print(adc_28)
 str_1=" "
 str_2=" "
@@ -39,8 +40,8 @@ while True:
     m_secs=time.localtime()[6]
     print(percent1)
     if(abs(percent1-percent0)>=2.0):
-       str_1=(str(percent1-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
-       break
+        str_1=(str(percent1-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
+        break
     
 #second resistor
 while True:
@@ -56,6 +57,7 @@ while True:
     m_secs=time.localtime()[6]
     print(percent1)
     if(abs(percent1-percent0)>=2.0):
-       str_2=(str(percent1-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
-       com1.send(str_1+"\n"+str_2)
-       break    
+        str_2=(str(percent1-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
+        com1.send(str_1+"\n"+str_2)
+        break    
+sleep(10)
