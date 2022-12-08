@@ -4,7 +4,7 @@ from easy_comms import Easy_comms
 from time import sleep
 from machine import Pin, ADC
 import json
-import time
+import utime
 
 com1 = Easy_comms(0,9600)
 calib_value = []
@@ -27,6 +27,7 @@ while True:
     if message is not None:
         try:
             calib_value = float(message)
+            calib_time = utime.ticks_ms()
             break
         except Exception as e:
             print(f'error: {e}')
@@ -43,14 +44,11 @@ while True:
     #com1.send(str(56.0))
     adc_26=ADC(26).read_u16()
     percent2 = adc_26 * conversion_factor
-    hrs=time.localtime()[3]
-    mins=time.localtime()[4]
-    secs=time.localtime()[5]
-    m_secs=time.localtime()[6]
+    m_secs = utime.ticks_ms()
     if(abs(percent2-percent0)>=3.0):
        data_time_array[0][0] = float(percent2 - percent0)
-       data_time_array[0][1] = float(secs)
-       pr26a=(str(percent2-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
+       data_time_array[0][1] = float(m_secs - calib_time)
+       pr26a=(str(percent2-percent0)+" "+str(m_secs))
        print(pr26a)
        break
 
@@ -59,14 +57,11 @@ while True:
     #com1.send(str(56.0))
     adc_27=ADC(27).read_u16()
     percent3 = adc_27 * conversion_factor
-    hrs=time.localtime()[3]
-    mins=time.localtime()[4]
-    secs=time.localtime()[5]
-    m_secs=time.localtime()[6]
+    m_secs = utime.ticks_ms()
     if(abs(percent3-percent0)>=3.0):
        data_time_array[1][0] = float(percent3 - percent0)
-       data_time_array[1][1] = float(secs)
-       pr27a=(str(percent3-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
+       data_time_array[1][1] = float(m_secs - calib_time)
+       pr27a=(str(percent3-percent0)+" "+str(m_secs))
        print(pr27a)
        break
  
@@ -76,15 +71,11 @@ while True:
     #com1.send(str(56.0))
     adc_28=ADC(28).read_u16()
     percent1 = adc_28 * conversion_factor
-
-    hrs=time.localtime()[3]
-    mins=time.localtime()[4]
-    secs=time.localtime()[5]
-    m_secs=time.localtime()[6]
+    m_secs = utime.ticks_ms()
     if(abs(percent1-percent0)>=3.0):
        data_time_array[2][0] = float(percent1 - percent0)
-       data_time_array[2][1] = float(secs)
-       pr28a=(str(percent1-percent0)+" "+str(hrs)+":"+str(mins)+":"+str(secs)+":"+str(m_secs))
+       data_time_array[2][1] = float(m_secs - calib_time)
+       pr28a=(str(percent1-percent0)+" "+str(m_secs))
        print(pr28a)
        break 
 
@@ -112,6 +103,25 @@ while True:
             print(f'error: {e}')
             break
 print(data_time_array)
-        
+
+# calculate velocities
+vel = []
+time_value = 0
+for i in range(0,4):
+    distance_value = data_time_array[i+1][2] - data_time_array[i][2]
+    time_value = (data_time_array[i+1][1] - data_time_array[i][1]) * 0.001 # convert to s
+    vel.append(distance_value/time_value)
+
+print(vel)
+
+acc = []
+time_value = 0
+for i in range(1,4):
+    vel_value = vel[i] - vel[i-1]
+    time_value = (data_time_array[i+1][1] - data_time_array[i-1][1]) * 0.001 # convert to s
+    acc.append(vel_value/time_value)
+
+print("acceleration values", acc)
+print("average a", (acc[0] + acc[1] + acc[2])/3)
 # calculate acceleration 
 
