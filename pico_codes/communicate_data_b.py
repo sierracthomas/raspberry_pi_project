@@ -10,6 +10,25 @@ import json
 #sleep(0.1)
 #print(int(time.time()*1000))
 
+led = Pin(10, Pin.OUT)
+led.toggle()
+sleep(0.2)
+led.toggle()
+
+led = Pin(11, Pin.OUT)
+led.toggle()
+sleep(0.2)
+led.toggle()
+
+led = Pin(12, Pin.OUT)
+led.on()
+sleep()
+led.off()
+
+led = Pin("LED", Pin.OUT)
+led.on()
+sleep(0.2)
+led.off()
 
 
 command = {'command':'blink', 'args': 'on'}
